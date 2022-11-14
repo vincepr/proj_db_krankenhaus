@@ -7,7 +7,7 @@ Informationen über Patienten, Ärtze und Schwestern sollen damit abfragbar sein
 Die Datenbank soll in der Lage sein, folgende Informationen zu liefern:
 - Welche Ärzte behandeln welche Patienten?
 - Welches Zimmer kann einem neuen Patienten zugeordnet werden?
-- Wie viele freie Zimmer hat die Chirugie heute?
+- Wie viele freie Zimmer hat die Chirurgie heute?
 - Welche Ärzte arbeiten in der HNO-Abteilung?
 - Für welches Zimmer ist Oberschwester "Hilde" zuständig?
 
@@ -56,12 +56,12 @@ erstellen des Relationenmodells:
 
 Überprüfen ob alle Anforderung von diesem Entwurf abgedeckt werden.
 
-## 3. Erstellung der SQL Befehle
+## # SQL- CREATE DATABASE, CREATE TABLES
 
 ```
 
 --- Create DATABASE ---
-DROP DATABASE IF EXISTS kh_abteilungsverwaltung;
+DROP DATABASE IF EXISTS kh_abteilungsverwaltung;                    #delete existing database to start from clean state
 CREATE DATABASE kh_abteilungsverwaltung;
 USE kh_abteilungsverwaltung;
 
@@ -102,7 +102,7 @@ CREATE TABLE
 		datum_aufnahme DATE,
         datum_entlassung DATE,
         zimmer_id INT,
-        pazient_id INT,
+        patient_id INT,
         FOREIGN KEY (zimmer_id) REFERENCES zimmer(id),
         FOREIGN KEY (patient_id) REFERENCES patient(id)
 );
@@ -125,8 +125,89 @@ CREATE TABLE
 
 ```
 
+## # SQL fill test-data to test queries
 
-### Erstellen der geforderten Abfragen
+
+```
+INSERT INTO 
+    abteilung(bezeichnung)
+VALUES
+    ("HNO"), 
+    ("Chirurgie")
+;
+
+INSERT INTO 
+    pflegekraft(vorname, nachname, abteilung_id)
+VALUES
+    ("Hilde", "Bingen", 1),
+    ("Gertrude", "Smith", 2),
+    ("Adam", "Sanders", 1)
+;
+
+INSERT INTO 
+    arzt(vorname, nachname, abteilung_id)
+VALUES
+    ("Dieter", "Ohrenarzt", 1),
+    ("Dennis", "Knochenbrecher", 2)
+;
+
+INSERT INTO                                 #5 Zimmer im 1OG für HNO, 4 Zimmer im 2OG für Chirurgie
+    zimmer(stockwerk, abteilung_id)
+VALUES
+    (1, 1),
+    (1, 1),
+    (1, 1),
+    (1, 1),
+    (1, 1),
+    (2, 2),
+    (2, 2),
+    (2, 2),
+    (2, 2)
+;
+
+INSERT INTO 
+    patient(vorname, nachname, krankenkasse)
+VALUES
+    ("Paula", "Friedrichs", "AOK-04351-156547"),
+    ("Peter", "Horst", "TK-00503-125125"),
+    ("Tropfende", "Nase", "TK-00503-125125"),
+    ("Taubes", "Ohr", "TK-00503-125125")
+;
+
+--- patienten die schon wieder entlassen wurden
+INSERT INTO 
+    aufenthalt(datum_aufnahme, datum_entlassung, zimmer_id, patient_id)
+VALUES
+    ("2021-12-1", "2021-12-20", 3, 1)
+;
+
+--- patienten die noch in behandlung sind
+INSERT INTO 
+    aufenthalt(datum_aufnahme, zimmer_id, patient_id)
+VALUES
+    ("2022-1-5", 6, 1),
+    ("2022-1-8", 8, 2),
+    ("2022-1-19", 1, 3),
+    ("2022-2-22", 2, 4)
+;
+
+--- behandlungen die die Ärtzte vorgenommen haben. Liefert Ergebnisse für erste Anfrage
+INSERT INTO 
+    behandlung_arzt(arzt_id, aufenthalt_id)
+VALUES
+    (1, 1),                                     #patient wurde 2 mal von HANO arzt behandelt
+    (1, 1),
+    (2, 2),                                     #chirurgischer Eingriff arzt
+    (2, 3),                                     #chirurgischer Eingriff arzt
+    (1, 4),                                     #hno Eingriff arzt
+    (1, 5),                                     #hno Eingriff arzt
+    (1, 5)                                     #hno  Eingriff arzt
+;
+
+```
+
+
+## # SELECT queries
 
 ```
 --- Welche Ärzte behandeln welche Patienten ---
@@ -136,8 +217,8 @@ SELECT arzt.id, arzt.nachname, arzt.vorname,
     INNER JOIN behandlung_arzt ON arzt.id=arzt_id
     INNER JOIN aufenthalt ON aufenthalt.id=aufenthalt_id
     INNER JOIN patient ON patient.id=patient_id
-    WHERE datum_entlassung IS NOT null                      # filter out already released patients and get only the ones currently in treatment
-    GROUP BY arzt.id, patient.id                            # filter out double entries where a doc did multiple procedures on the same patient
+    WHERE datum_entlassung IS NOT null                      # filter out already released patients
+    GROUP BY arzt.id, patient.id                            # filter out double entries where doc did multiple procedures
 ;
 
 --- Welches Zimmer kann einem neuen Patienten zugeordnet werden? ---
@@ -153,7 +234,7 @@ WHERE t2.id is null                                         # alle zimmer die mo
 ;
 
 
---- Wie viele freie Zimmer hat die Chirugie heute? ---
+--- Wie viele freie Zimmer hat die Chirurgie heute? ---
 SELECT COUNT(*)                                             # modify query from above
 from zimmer 
 LEFT JOIN (
@@ -163,7 +244,7 @@ LEFT JOIN (
     WHERE datum_entlassung IS NULL
 ) AS t2 On zimmer.id = t2.id
 INNER JOIN abteilung ON abteilung.id=abteilung_id
-WHERE t2.id is null AND abteilung.bezeichnung
+WHERE t2.id is null AND abteilung.bezeichnung="Chirurgie"
 ;
 
 --- Welche Ärzte arbeiten in der HNO-Abteilung ---
@@ -174,18 +255,12 @@ WHERE abteilung.bezeichnung="HNO"
 ;
 
 --- Für welche Zimmer ist Oberschwerster "Hilde" zuständig---
-select zimmer.id, zimmer.stockwerk, pflegekraft.nachname
+select zimmer.id AS ZimmerNr, zimmer.stockwerk, pflegekraft.vorname
 FROM pflegekraft
 INNER JOIN abteilung ON pflegekraft.abteilung_id=abteilung.id
-INNER JOIN zimmer    ON zimmer.abteilung_id     =abteilung.id
+RIGHT JOIN zimmer    ON zimmer.abteilung_id     =abteilung.id
+WHERE pflegekraft.vorname = "Hilde"
 ;
 
 ```
 
-### einlesen von Datensätzen zum testen der Datenbank
-
-```
-
-
-
-```

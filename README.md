@@ -211,9 +211,11 @@ VALUES
 ## # SELECT queries
 
 ```
+--- create views for querries ---
 --- Welche Ärzte behandeln welche Patienten ---
-SELECT arzt.id, arzt.nachname, arzt.vorname, 
-        patient.id, patient.nachname, patient.vorname
+CREATE VIEW v1 AS
+SELECT arzt.id AS ArztID, arzt.nachname AS ArztNachname, arzt.vorname AS ArztVorname, 
+        patient.id as PatientID, patient.nachname, patient.vorname
     from arzt 
     INNER JOIN behandlung_arzt ON arzt.id=arzt_id
     INNER JOIN aufenthalt ON aufenthalt.id=aufenthalt_id
@@ -223,7 +225,8 @@ SELECT arzt.id, arzt.nachname, arzt.vorname,
 ;
 
 --- Welches Zimmer kann einem neuen Patienten zugeordnet werden? ---
-SELECT *                                                    #Liste aller freien Zimmer gesucht
+CREATE VIEW v2 AS
+SELECT zimmer.id                                                    #Liste aller freien Zimmer gesucht
 from zimmer 
 LEFT JOIN (
     SELECT zimmer.id AS id                                  # alle zimmer die momentan belegt sind
@@ -236,6 +239,7 @@ WHERE t2.id is null                                         # alle zimmer die mo
 
 
 --- Wie viele freie Zimmer hat die Chirurgie heute? ---
+CREATE VIEW v3 AS
 SELECT COUNT(*)                                             # modify query from above
 from zimmer 
 LEFT JOIN (
@@ -249,19 +253,43 @@ WHERE t2.id is null AND abteilung.bezeichnung="Chirurgie"
 ;
 
 --- Welche Ärzte arbeiten in der HNO-Abteilung ---
-SELECT *
+CREATE VIEW v4 AS
+SELECT arzt.*
 FROM arzt
 INNER JOIN abteilung ON abteilung.id= abteilung_id
 WHERE abteilung.bezeichnung="HNO"
 ;
 
 --- Für welche Zimmer ist Oberschwerster "Hilde" zuständig---
+CREATE VIEW v5 AS
 select zimmer.id AS ZimmerNr, zimmer.stockwerk, pflegekraft.vorname
 FROM pflegekraft
 INNER JOIN abteilung ON pflegekraft.abteilung_id=abteilung.id
 RIGHT JOIN zimmer    ON zimmer.abteilung_id     =abteilung.id
 WHERE pflegekraft.vorname = "Hilde"
 ;
+
+
+--- use querries with test-data ---
+
+SELECT * FROM v1 
+;--- Welche Ärzte behandeln welche Patienten:
+
+SELECT * FROM v2
+;--- Welches Zimmer kann einem neuen Patienten zugeordnet werden?:
+
+
+SELECT * FROM v3
+;--- Wie viele freie Zimmer hat die Chirurgie heute?:
+
+
+SELECT * FROM v4
+;--- Welche Ärzte arbeiten in der HNO-Abteilung:
+
+
+SELECT * FROM v5
+;--- Für welche Zimmer ist Oberschwerster "Hilde" zuständig:
+
 
 ```
 

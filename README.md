@@ -129,6 +129,7 @@ CREATE TABLE
 
 
 ```
+--- INSERT data into tables. Test data to test for correct behavior ---
 INSERT INTO 
     abteilung(bezeichnung)
 VALUES

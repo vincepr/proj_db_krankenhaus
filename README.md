@@ -28,6 +28,9 @@ Sie Ihr Datenbankmodell, begründen Ihre Vorgehensweise,
 beschreiben Ihre Umsetzung in SQL und geben ein Fazit,  
 ob die oben genannten Fragen umgesetzt sind.  
 
+# Präsentation:
+[Powerpoint Datei Probst_Datenbank_Krankenhaus.pptx](Datenbank_Krankenhaus.pptx)
+
 # Dokumentation
 
 1) Konzeption und Erstellen des ER-Diagrammes
@@ -50,13 +53,13 @@ Auflösen der n-m Beziehungen in gesonderten Tabellen mit passenden attributen.
 - behandlung_pflegekraft zwischen Tabellen aufenthalt und pflegekraft
 
 Festlegen der Primär und Fremdschlüssel und ihrer Zugehörigkeit.  
-erstellen des Relationenmodells:
+erstellen des Relationenmodells. Anschließend überprüfen ob alle Anforderung von diesem Entwurf abgedeckt werden.
 
 ![Relationen Modell](img/RM0.png)
 
-Überprüfen ob alle Anforderung von diesem Entwurf abgedeckt werden.
 
-## # SQL- CREATE DATABASE, CREATE TABLES
+
+## # 3.1 SQL- CREATE DATABASE, CREATE TABLES
 
 ```
 
@@ -125,7 +128,7 @@ CREATE TABLE
 
 ```
 
-## # SQL fill test-data to test queries
+## # 3.2 SQL fill test-data to test queries
 
 
 ```
@@ -208,7 +211,7 @@ VALUES
 ```
 
 
-## # SELECT queries
+## # 3.3 VIEWS of required SELECT queries
 
 ```
 -- create views for querries --
@@ -271,7 +274,6 @@ WHERE pflegekraft.vorname = "Hilde"
 
 
 -- use querries with test-data --
-
 SELECT * FROM v1 
 ;-- Welche Ärzte behandeln welche Patienten:
 
@@ -289,6 +291,18 @@ SELECT * FROM v4
 
 SELECT * FROM v5
 ;-- Für welche Zimmer ist Oberschwerster "Hilde" zuständig:
+
+
+-- clear  test-datasets from tables, to get to a clean state--
+#just clear all rows, keep tables
+DELETE FROM abteilung;
+DELETE FROM pflegekraft;
+DELETE FROM arzt;
+DELETE FROM zimmer;
+DELETE FROM behandlung_pflegekraft;
+DELETE FROM behandlung_arzt;
+DELETE FROM aufenthalt;
+DELETE FROM patient;
 
 
 ```

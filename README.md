@@ -60,12 +60,12 @@ erstellen des Relationenmodells:
 
 ```
 
---- Create DATABASE ---
+-- Create DATABASE --
 DROP DATABASE IF EXISTS kh_abteilungsverwaltung;                    #delete existing database to start from clean state
 CREATE DATABASE kh_abteilungsverwaltung;
 USE kh_abteilungsverwaltung;
 
---- Create Tables ---
+-- Create Tables --
 CREATE TABLE 
 	abteilung(id INT AUTO_INCREMENT PRIMARY KEY, 
 		bezeichnung VARCHAR(60)
@@ -129,7 +129,7 @@ CREATE TABLE
 
 
 ```
---- INSERT data into tables. Test data to test for correct behavior ---
+-- INSERT data into tables. Test data to test for correct behavior --
 INSERT INTO 
     abteilung(bezeichnung)
 VALUES
@@ -175,14 +175,14 @@ VALUES
     ("Taubes", "Ohr", "TK-00503-125125")
 ;
 
---- patienten die schon wieder entlassen wurden
+-- patienten die schon wieder entlassen wurden
 INSERT INTO 
     aufenthalt(datum_aufnahme, datum_entlassung, zimmer_id, patient_id)
 VALUES
     ("2021-12-1", "2021-12-20", 3, 1)
 ;
 
---- patienten die noch in behandlung sind
+-- patienten die noch in behandlung sind
 INSERT INTO 
     aufenthalt(datum_aufnahme, zimmer_id, patient_id)
 VALUES
@@ -192,7 +192,7 @@ VALUES
     ("2022-2-22", 2, 4)
 ;
 
---- behandlungen die die Ärtzte vorgenommen haben. Liefert Ergebnisse für erste Anfrage
+-- behandlungen die die Ärtzte vorgenommen haben. Liefert Ergebnisse für erste Anfrage
 INSERT INTO 
     behandlung_arzt(arzt_id, aufenthalt_id)
 VALUES
@@ -211,8 +211,8 @@ VALUES
 ## # SELECT queries
 
 ```
---- create views for querries ---
---- Welche Ärzte behandeln welche Patienten ---
+-- create views for querries --
+-- Welche Ärzte behandeln welche Patienten --
 CREATE VIEW v1 AS
 SELECT arzt.id AS ArztID, arzt.nachname AS ArztNachname, arzt.vorname AS ArztVorname, 
         patient.id as PatientID, patient.nachname, patient.vorname
@@ -224,7 +224,7 @@ SELECT arzt.id AS ArztID, arzt.nachname AS ArztNachname, arzt.vorname AS ArztVor
     GROUP BY arzt.id, patient.id                            # filter out double entries where doc did multiple procedures
 ;
 
---- Welches Zimmer kann einem neuen Patienten zugeordnet werden? ---
+-- Welches Zimmer kann einem neuen Patienten zugeordnet werden? --
 CREATE VIEW v2 AS
 SELECT zimmer.id                                                    #Liste aller freien Zimmer gesucht
 from zimmer 
@@ -238,7 +238,7 @@ WHERE t2.id is null                                         # alle zimmer die mo
 ;
 
 
---- Wie viele freie Zimmer hat die Chirurgie heute? ---
+-- Wie viele freie Zimmer hat die Chirurgie heute? --
 CREATE VIEW v3 AS
 SELECT COUNT(*)                                             # modify query from above
 from zimmer 
@@ -252,7 +252,7 @@ INNER JOIN abteilung ON abteilung.id=abteilung_id
 WHERE t2.id is null AND abteilung.bezeichnung="Chirurgie"
 ;
 
---- Welche Ärzte arbeiten in der HNO-Abteilung ---
+-- Welche Ärzte arbeiten in der HNO-Abteilung --
 CREATE VIEW v4 AS
 SELECT arzt.*
 FROM arzt
@@ -260,7 +260,7 @@ INNER JOIN abteilung ON abteilung.id= abteilung_id
 WHERE abteilung.bezeichnung="HNO"
 ;
 
---- Für welche Zimmer ist Oberschwerster "Hilde" zuständig---
+-- Für welche Zimmer ist Oberschwerster "Hilde" zuständig--
 CREATE VIEW v5 AS
 select zimmer.id AS ZimmerNr, zimmer.stockwerk, pflegekraft.vorname
 FROM pflegekraft
@@ -270,26 +270,40 @@ WHERE pflegekraft.vorname = "Hilde"
 ;
 
 
---- use querries with test-data ---
+-- use querries with test-data --
 
 SELECT * FROM v1 
-;--- Welche Ärzte behandeln welche Patienten:
+;-- Welche Ärzte behandeln welche Patienten:
 
 SELECT * FROM v2
-;--- Welches Zimmer kann einem neuen Patienten zugeordnet werden?:
+;-- Welches Zimmer kann einem neuen Patienten zugeordnet werden?:
 
 
 SELECT * FROM v3
-;--- Wie viele freie Zimmer hat die Chirurgie heute?:
+;-- Wie viele freie Zimmer hat die Chirurgie heute?:
 
 
 SELECT * FROM v4
-;--- Welche Ärzte arbeiten in der HNO-Abteilung:
+;-- Welche Ärzte arbeiten in der HNO-Abteilung:
 
 
 SELECT * FROM v5
-;--- Für welche Zimmer ist Oberschwerster "Hilde" zuständig:
+;-- Für welche Zimmer ist Oberschwerster "Hilde" zuständig:
 
 
 ```
 
+
+
+SELECT * FROM v2
+;-- Welches Zimmer kann einem neuen Patienten zugeordnet werden?:
++---+
+| id |
++---+
+|  3 |
+|  4 |
+|  5 |
+|  7 |
+|  9 |
++---+
+5 rows in set (0.001 sec)

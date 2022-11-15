@@ -292,18 +292,3 @@ SELECT * FROM v5
 
 
 ```
-
-
-
-SELECT * FROM v2
-;-- Welches Zimmer kann einem neuen Patienten zugeordnet werden?:
-+---+
-| id |
-+---+
-|  3 |
-|  4 |
-|  5 |
-|  7 |
-|  9 |
-+---+
-5 rows in set (0.001 sec)

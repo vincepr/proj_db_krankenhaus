@@ -217,7 +217,7 @@ SELECT arzt.id, arzt.nachname, arzt.vorname,
     INNER JOIN behandlung_arzt ON arzt.id=arzt_id
     INNER JOIN aufenthalt ON aufenthalt.id=aufenthalt_id
     INNER JOIN patient ON patient.id=patient_id
-    WHERE datum_entlassung IS NOT null                      # filter out already released patients
+    WHERE datum_entlassung IS null                          # filter out already released patients
     GROUP BY arzt.id, patient.id                            # filter out double entries where doc did multiple procedures
 ;
 

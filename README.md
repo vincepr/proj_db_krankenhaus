@@ -273,6 +273,7 @@ WHERE pflegekraft.vorname = "Hilde"
 ;
 
 
+
 -- use querries with test-data --
 SELECT * FROM v1 
 ;-- Welche Ärzte behandeln welche Patienten:
@@ -293,9 +294,9 @@ SELECT * FROM v5
 ;-- Für welche Zimmer ist Oberschwerster "Hilde" zuständig:
 
 
+
 -- clear  test-datasets from tables, to get to a clean state--
 #just clear all rows, keep tables, go from indside to outside because of references
-
 
 DELETE FROM behandlung_arzt;
 DELETE FROM behandlung_pflegekraft;
@@ -305,8 +306,6 @@ DELETE FROM zimmer;
 DELETE FROM arzt;
 DELETE FROM pflegekraft;
 DELETE FROM abteilung;
-
-
 
 
 ```

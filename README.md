@@ -294,15 +294,19 @@ SELECT * FROM v5
 
 
 -- clear  test-datasets from tables, to get to a clean state--
-#just clear all rows, keep tables
-DELETE FROM abteilung;
-DELETE FROM pflegekraft;
-DELETE FROM arzt;
-DELETE FROM zimmer;
-DELETE FROM behandlung_pflegekraft;
+#just clear all rows, keep tables, go from indside to outside because of references
+
+
 DELETE FROM behandlung_arzt;
+DELETE FROM behandlung_pflegekraft;
 DELETE FROM aufenthalt;
 DELETE FROM patient;
+DELETE FROM zimmer;
+DELETE FROM arzt;
+DELETE FROM pflegekraft;
+DELETE FROM abteilung;
+
+
 
 
 ```
